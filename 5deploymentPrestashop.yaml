@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: 'exam-4kub'
+  name: prestashop-deployment
+  labels:
+    app: prestashop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prestashop
+  template:
+    metadata:
+      labels:
+        app: prestashop
+    spec:
+      initContainers:
+      - name: init-prestashop
+        image: busybox:1.28
+        command: 
+          - chmod
+          - '777'
+          - '/bitnami/prestashop'
+        volumeMounts:
+        - mountPath: "/bitnami/prestashop"
+          name: mypd
+      containers:
+      - name: prestashop
+        image: bitnami/prestashop:1.7
+        volumeMounts:
+        - mountPath: "/bitnami/prestashop"
+          name: mypd
+        ports:
+        - containerPort: 80
+        env:
+          - name: PRESTASHOP_FIRST_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: prestashop-configmap
+                key: prestashop_first_name
+          - name: PRESTASHOP_LAST_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: 'prestashop-configmap'
+                key: prestashop_last_name
+          - name: PRESTASHOP_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: 'prestashop-configmap'
+                key: prestashop_host
+          - name: PRESTASHOP_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: 'prestashop-secret'
+                key: prestashop_password
+          - name: PRESTASHOP_EMAIL
+            valueFrom:
+             secretKeyRef:
+                name: 'prestashop-secret'
+                key: prestashop_email
+          - name: MARIADB_HOST
+            valueFrom:
+             secretKeyRef:
+                name: 'prestashop-secret'
+                key: mariadb_host
+          - name: PRESTASHOP_DATABASE_NAME
+            valueFrom:
+             secretKeyRef:
+                name: 'prestashop-secret'
+                key: prestashop_database_name
+          - name: PRESTASHOP_DATABASE_USER
+            valueFrom:
+             secretKeyRef:
+                name: 'prestashop-secret'
+                key: prestashop_database_user
+          - name: PRESTASHOP_DATABASE_PASSWORD
+            valueFrom:
+             secretKeyRef:
+                name: 'prestashop-secret'
+                key: prestashop_database_password
+      volumes:
+      - name: mypd
+        persistentVolumeClaim:
+          claimName: prestashop-pvc
+

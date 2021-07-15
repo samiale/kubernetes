@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: 'exam-4kub'
+  name: mariadb-deployment
+  labels:
+    app: mariadb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mariadb
+  template:
+    metadata:
+      labels:
+        app: mariadb
+    spec:
+      initContainers:
+      - name: init-mariadb
+        image: busybox:1.28
+        command: 
+          - chmod
+          - '777'
+          - '/bitnami/mariadb'
+        volumeMounts:
+        - mountPath: "/bitnami/mariadb"
+          name: mypd
+      containers:
+      - name: mariadb
+        image: bitnami/mariadb:10.1
+        volumeMounts:
+        - mountPath: "/bitnami/mariadb"
+          name: mypd
+        ports:
+        - containerPort: 3306
+        env:
+          - name: MARIADB_USER
+            valueFrom:
+              secretKeyRef:
+                name: prestashop-secret
+                key: prestashop_database_user
+          - name: MARIADB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: prestashop-secret
+                key: prestashop_database_password
+          - name: MARIADB_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: prestashop-secret
+                key: prestashop_database_name
+          - name: MARIADB_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: prestashop-secret
+                key: mariadb_root_password
+      volumes:
+      - name: mypd
+        persistentVolumeClaim:
+          claimName: mariadb-pvc
