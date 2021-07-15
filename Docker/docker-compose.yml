@@ -1,0 +1,36 @@
+version: "3.0"
+services:
+
+  # front-end
+  pozos-frontend:
+    image:  php:apache
+    container_name: "pozos-frontend"
+    volumes:
+      - ./website:/var/www/html
+    environment:
+      USERNAME: "toto"
+      PASSWORD: "python"
+    networks:
+      - pozos
+    ports:
+      - 8000:80
+    depends_on:
+      - pozos-api
+
+  # API Backend
+  pozos-api:
+    image: pozos-api
+    container_name: "pozos-api"
+    build:
+     context: ./simple_api
+     dockerfile: Dockerfile
+    volumes:
+      - ./simple_api/student_age.json:/data/student_age.json
+    ports:
+      - 5000:5000
+    networks:
+      - pozos
+
+networks:
+  pozos:
+    driver: bridge
