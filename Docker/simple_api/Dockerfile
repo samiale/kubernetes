@@ -1,7 +1,7 @@
 FROM python:2.7-stretch
 
 #Maintainer of image
-LABEL maintainer="304964@supinfo.com"
+LABEL maintainer="285893@supinfo.com"
 
 #Install of dependencies
 RUN apt-get update -y && apt-get install python-dev python3-dev libsasl2-dev python-dev libldap2-dev libssl-dev -y
