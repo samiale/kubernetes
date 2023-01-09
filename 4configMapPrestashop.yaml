@@ -5,5 +5,5 @@ metadata:
   name: prestashop-configmap
 data:
   prestashop_first_name: "Samia"
-  prestashop_last_name: "Lettal"
+  prestashop_last_name: "Lettat"
   prestashop_host: "cn.prestashop.us"
